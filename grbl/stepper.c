@@ -248,6 +248,11 @@ void st_wake_up()
     for (idx = 0; idx < N_AXIS; idx++) {
       st.step_outbits[idx] = step_port_invert_mask[idx];
     }
+  #elif defined(CPU_MAP_MINI_RAMBO_1_3A_BOARD)
+    if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { STEPPERS_DISABLE_PORT |= (STEPPERS_DISABLE_MASK); }
+    else { STEPPERS_DISABLE_PORT &= ~(STEPPERS_DISABLE_MASK); }
+    // Initialize stepper output bits to ensure first ISR call does not step.
+    st.step_outbits = step_port_invert_mask;
   #else
     if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
     else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
@@ -298,6 +303,9 @@ void st_go_idle()
       STEPPER_DISABLE_PORT(1) &= ~(1 << STEPPER_DISABLE_BIT(1));
       STEPPER_DISABLE_PORT(2) &= ~(1 << STEPPER_DISABLE_BIT(2));
     }
+  #elif defined(CPU_MAP_MINI_RAMBO_1_3A_BOARD)
+    if (pin_state) { STEPPERS_DISABLE_PORT |= STEPPERS_DISABLE_MASK; }
+    else { STEPPERS_DISABLE_PORT &= ~(STEPPERS_DISABLE_MASK); }
   #else
     if (pin_state) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
     else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
@@ -659,6 +667,37 @@ void st_reset()
 // Initialize and start the stepper motor subsystem
 void stepper_init()
 {
+  // Configure microstepping pins
+  #ifdef CPU_MAP_MINI_RAMBO_1_3A_BOARD
+    // Configure the microstepping pins
+    SET_OUTPUT( X_MS1_PIN);
+    SET_OUTPUT( X_MS2_PIN);
+    SET_OUTPUT( Y_MS1_PIN);
+    SET_OUTPUT( Y_MS2_PIN);
+    SET_OUTPUT( Z_MS1_PIN);
+    SET_OUTPUT( Z_MS2_PIN);
+    SET_OUTPUT(E0_MS1_PIN);
+    SET_OUTPUT(E0_MS2_PIN);
+    WRITE(      X_MS1_PIN, 1);
+    WRITE(      X_MS2_PIN, 1);
+    WRITE(      Y_MS1_PIN, 1);
+    WRITE(      Y_MS2_PIN, 1);
+    WRITE(      Z_MS1_PIN, 1);
+    WRITE(      Z_MS2_PIN, 1);
+    WRITE(     E0_MS1_PIN, 1);
+    WRITE(     E0_MS2_PIN, 1);
+    
+    // Configure the analog voltage reference
+    SET_OUTPUT(XY_REF_PIN);
+    SET_OUTPUT(Z_REF_PIN);
+    SET_OUTPUT(E_REF_PIN);
+    REF_TCCRA_REGISTER = REF_TCCRA_INIT_MASK;
+    REF_TCCRB_REGISTER = REF_TCCRB_INIT_MASK;
+    REF_XY_OCR_REGISTER = MOTOR_CURRENT_PWM(MOTOR_XY_CURRENT);
+    REF_Z_OCR_REGISTER  = MOTOR_CURRENT_PWM(MOTOR_Z_CURRENT);
+    REF_E_OCR_REGISTER  = MOTOR_CURRENT_PWM(MOTOR_E_CURRENT);
+  #endif
+  
   // Configure step and direction interface pins
   #ifdef DEFAULTS_RAMPS_BOARD
     STEP_DDR(0) |= 1<<STEP_BIT(0);
@@ -674,7 +713,11 @@ void stepper_init()
     DIRECTION_DDR(2) |= 1<<DIRECTION_BIT(2);
   #else
     STEP_DDR |= STEP_MASK;
+    #ifdef CPU_MAP_MINI_RAMBO_1_3A_BOARD
+    STEPPERS_DISABLE_DDR |= STEPPERS_DISABLE_MASK;
+    #else
     STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
+    #endif
     DIRECTION_DDR |= DIRECTION_MASK;
   #endif // Ramps Board
 

@@ -35,7 +35,8 @@
 // one configuration file by placing their specific defaults and pin map at the bottom of this file.
 // If doing so, simply comment out these two defines and see instructions below.
 #define DEFAULTS_GENERIC
-#define CPU_MAP_2560_INITIAL
+//#define CPU_MAP_2560_INITIAL
+#define CPU_MAP_MINI_RAMBO_1_3A_BOARD
 
 // To use with RAMPS 1.4 Board, comment out the above defines and uncomment the next two defines
 // #define DEFAULTS_RAMPS_BOARD
