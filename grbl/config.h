@@ -90,7 +90,7 @@
 // If homing is enabled, homing init lock sets Grbl into an alarm state upon power up. This forces
 // the user to perform the homing cycle (or override the locks) before doing anything else. This is
 // mainly a safety feature to remind the user to home, since position is unknown to Grbl.
-#define HOMING_INIT_LOCK // Comment to disable
+//#define HOMING_INIT_LOCK // Comment to disable
 
 // Define the homing cycle patterns with bitmasks. The homing cycle first performs a search mode
 // to quickly engage the limit switches, followed by a slower locate mode, and finished by a short
@@ -107,7 +107,11 @@
 // on separate pin, but homed in one cycle. Also, it should be noted that the function of hard limits
 // will not be affected by pin sharing.
 // NOTE: Defaults are set for a traditional 3-axis CNC machine. Z-axis first to clear, followed by X & Y.
-#ifdef DEFAULTS_RAMPS_BOARD
+#ifdef CPU_MAP_MINI_RAMBO_1_3A_BOARD
+  #define HOMING_CYCLE_0 (1<<X_AXIS)   // Home X axis
+  #define HOMING_CYCLE_1 (1<<Y_AXIS)   // Home Y axis
+  // #define HOMING_CYCLE_2            // Home Z axis
+#elif DEFAULTS_RAMPS_BOARD
   #define HOMING_CYCLE_0 (1<<X_AXIS)   // Home X axis
   #define HOMING_CYCLE_1 (1<<Y_AXIS)   // Home Y axis
   #define HOMING_CYCLE_2 (1<<Z_AXIS)   // OPTIONAL: Home Z axis 
@@ -195,7 +199,7 @@
 // NOTE: The top option will mask and invert all control pins. The bottom option is an example of
 // inverting only two control pins, the safety door and reset. See cpu_map.h for other bit definitions.
 // #define INVERT_CONTROL_PIN_MASK CONTROL_MASK // Default disabled. Uncomment to disable.
-// #define INVERT_CONTROL_PIN_MASK ((1<<CONTROL_SAFETY_DOOR_BIT)|(1<<CONTROL_RESET_BIT)) // Default disabled.
+#define INVERT_CONTROL_PIN_MASK ((1<<CONTROL_FEED_HOLD_BIT)|(1<<CONTROL_CYCLE_START_BIT)|(1<<CONTROL_CYCLE_START_BIT)) // Default disabled.
 
 // Inverts select limit pin states based on the following mask. This effects all limit pin functions,
 // such as hard limits and homing. However, this is different from overall invert limits setting.

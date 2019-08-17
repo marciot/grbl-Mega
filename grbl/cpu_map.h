@@ -76,9 +76,9 @@
   #define DIRECTION_DDR     DDRL
   #define DIRECTION_PORT    PORTL
   #define DIRECTION_PIN     PINL
-  #define X_DIRECTION_BIT   7 // X Dir - Pin L1
-  #define Y_DIRECTION_BIT   6 // Y Dir - Pin L0
-  #define Z_DIRECTION_BIT   5 // Z Dir - Pin L2
+  #define X_DIRECTION_BIT   1 // X Dir - Pin L1
+  #define Y_DIRECTION_BIT   0 // Y Dir - Pin L0
+  #define Z_DIRECTION_BIT   2 // Z Dir - Pin L2
   #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
 
   // Define stepper driver enable/disable output pin.
